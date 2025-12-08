@@ -1,9 +1,5 @@
-const Home = () => {
-  return (
-    <div className="text-5xl">
-      Home
-    </div>
-  )
-}
+import { redirect } from "next/navigation";
 
-export default Home
+export default function Home() {
+  redirect("/pos");
+}
