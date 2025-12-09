@@ -40,41 +40,26 @@ export const stores: Store[] = [
 ];
 
 // ============================================
-// ZUSTAND STORE - All global state in one place
+// ZUSTAND STORE
 // ============================================
 
-type AppState = {
-  // Store/Branch Selection
+type StoreContextState = {
   selectedStore: Store;
   selectedBranch: Branch;
   setSelectedStore: (store: Store) => void;
   setSelectedBranch: (branch: Branch) => void;
   switchStore: (store: Store) => void;
-
-  // Mobile Sidebar
-  isMobileSidebarOpen: boolean;
-  setMobileSidebarOpen: (open: boolean) => void;
-  toggleMobileSidebar: () => void;
-  closeMobileSidebar: () => void;
 };
 
 /**
- * Unified Zustand Store
+ * Store Context - manages multi-tenant store/branch selection
  * 
- * Contains all global app state:
- * - Store/Branch selection (for multi-tenant context)
- * - Mobile sidebar open/close state
- * 
- * Benefits of consolidating:
- * - Single source of truth
- * - No mixing of Context + Zustand
- * - Easier debugging
- * - Consistent patterns throughout app
+ * Used by:
+ * - Context Switcher (updates selection)
+ * - POS Page (reads selection to show correct products)
+ * - Header (displays current context on mobile)
  */
-export const useAppStore = create<AppState>((set) => ({
-  // ============================================
-  // STORE/BRANCH SELECTION
-  // ============================================
+export const useStoreContext = create<StoreContextState>((set) => ({
   selectedStore: stores[0],
   selectedBranch: stores[0].branches[0],
 
@@ -87,22 +72,5 @@ export const useAppStore = create<AppState>((set) => ({
       selectedStore: store,
       selectedBranch: store.branches[0],
     }),
-
-  // ============================================
-  // MOBILE SIDEBAR
-  // ============================================
-  isMobileSidebarOpen: false,
-
-  setMobileSidebarOpen: (open) => set({ isMobileSidebarOpen: open }),
-
-  toggleMobileSidebar: () =>
-    set((state) => ({ isMobileSidebarOpen: !state.isMobileSidebarOpen })),
-
-  closeMobileSidebar: () => set({ isMobileSidebarOpen: false }),
 }));
 
-// ============================================
-// LEGACY EXPORT - For backwards compatibility
-// ============================================
-// You can remove this once all components are updated
-export const useStoreSelector = useAppStore;

@@ -22,6 +22,10 @@ export const vapeshopCategories: Category[] = [
   { id: "e-liquids", label: "E-Liquids" },
   { id: "coils", label: "Coils" },
   { id: "devices", label: "Devices" },
+  { id: "accessories", label: "Accessories" },
+  { id: "batteries", label: "Batteries" },
+  { id: "pods", label: "Pod Cartridges" },
+  { id: "disposables", label: "Disposables" },
 ];
 
 // Products per branch (each branch has its own inventory/stock)
@@ -55,6 +59,10 @@ export const motoshopCategories: Category[] = [
   { id: "lubricants", label: "Lubricants" },
   { id: "brake-parts", label: "Brake Parts" },
   { id: "filters", label: "Filters" },
+  { id: "tires", label: "Tires" },
+  { id: "electronics", label: "Electronics" },
+  { id: "body-parts", label: "Body Parts" },
+  { id: "tools", label: "Tools & Equipment" },
 ];
 
 // Products per branch

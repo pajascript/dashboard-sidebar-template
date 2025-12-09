@@ -6,13 +6,16 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { sidebarLinks } from "@/constants";
 import { usePathname } from "next/navigation";
-import { useSidebar } from "./sidebar-context";
+import { useSidebarStore } from "@/lib/stores";
 import ContextSwitcher from "./context-switcher";
 
 const Sidebar = () => {
   const pathname = usePathname();
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const { isMobileOpen, setIsMobileOpen } = useSidebar();
+  
+  // Zustand - mobile sidebar state
+  const isMobileOpen = useSidebarStore((state) => state.isMobileOpen);
+  const closeMobile = useSidebarStore((state) => state.closeMobile);
 
   const toggleSidebar = () => {
     setIsSidebarExpanded(!isSidebarExpanded);
@@ -20,8 +23,8 @@ const Sidebar = () => {
 
   // Close mobile sidebar on route change
   useEffect(() => {
-    setIsMobileOpen(false);
-  }, [pathname, setIsMobileOpen]);
+    closeMobile();
+  }, [pathname, closeMobile]);
 
   // Prevent body scroll when mobile sidebar is open
   useEffect(() => {
@@ -40,29 +43,34 @@ const Sidebar = () => {
       <div>
         {/* Header */}
         <div className={cn(
-          "flex items-center min-w-0 gap-8 border-b border-[#303030] pb-6 justify-between overflow-hidden",
-          isMobile ? "px-5" : (isSidebarExpanded ? "px-5" : "px-6")
+          "flex items-center min-w-0 gap-8 border-b border-[#303030] pb-6 justify-between overflow-hidden px-5",
+          // Desktop: adjust padding when collapsed
+          !isMobile && !isSidebarExpanded && "lg:px-6",
+          !isMobile && "max-lg:px-6"
         )}>
           <h1 className={cn(
             "text-xl font-medium ml-2 text-[#FAFAFA] whitespace-nowrap overflow-hidden",
-            !isMobile && !isSidebarExpanded && "hidden"
+            // Desktop only: hide title on max-lg, or when manually collapsed
+            !isMobile && "max-lg:hidden",
+            !isMobile && !isSidebarExpanded && "lg:hidden"
           )}>
             ERP Dashboard
           </h1>
           {isMobile ? (
             <button
               type="button"
-              onClick={() => setIsMobileOpen(false)}
+              onClick={closeMobile}
               className="px-2.5 py-2 rounded-md text-gray-300 hover:text-white hover:bg-[#262626] cursor-pointer transition-colors duration-300"
               aria-label="Close menu"
             >
               <X className="size-4" />
             </button>
           ) : (
+            // Toggle button - only visible on lg+ screens
             <button
               type="button"
               onClick={toggleSidebar}
-              className="px-2.5 py-2 rounded-md text-gray-300 hover:text-white hover:bg-[#262626] cursor-pointer transition-colors duration-300"
+              className="px-2.5 py-2 rounded-md text-gray-300 hover:text-white hover:bg-[#262626] cursor-pointer transition-colors duration-300 max-lg:hidden"
               aria-label="Toggle sidebar"
             >
               <ChevronLeft className={cn(
@@ -94,7 +102,9 @@ const Sidebar = () => {
                   className={cn(
                     "flex flex-row items-center w-full gap-3 rounded-xl p-3 text-[#A1A1A1] hover:bg-[#1f1f1f] hover:shadow-xs transition-all duration-300 hover:text-white",
                     isSelected && "bg-[#262626] shadow-xs text-white",
-                    !isMobile && !isSidebarExpanded && "justify-center"
+                    // Desktop only: center icons on max-lg, or when manually collapsed
+                    !isMobile && "max-lg:justify-center",
+                    !isMobile && !isSidebarExpanded && "lg:justify-center"
                   )}
                 >
                   <div className="relative size-5">
@@ -103,7 +113,9 @@ const Sidebar = () => {
                   <p className={cn(
                     "font-medium whitespace-nowrap overflow-hidden",
                     isSelected && "text-white",
-                    !isMobile && !isSidebarExpanded && "hidden"
+                    // Desktop only: hide text on max-lg, or when manually collapsed
+                    !isMobile && "max-lg:hidden",
+                    !isMobile && !isSidebarExpanded && "lg:hidden"
                   )}>
                     {link.title}
                   </p>
@@ -122,7 +134,10 @@ const Sidebar = () => {
       <aside
         className={cn(
           "sticky left-0 top-0 flex h-dvh flex-col justify-between border-r border-[#303030] bg-[#171717] pb-5 pt-6 max-md:hidden transition-[width] ease-in-out duration-300",
-          isSidebarExpanded ? "w-[265px]" : "w-21"
+          // max-lg: always collapsed (w-21)
+          // lg+: depends on isSidebarExpanded state
+          "max-lg:w-21",
+          isSidebarExpanded ? "lg:w-[265px]" : "lg:w-21"
         )}
       >
         <SidebarContent isMobile={false} />
@@ -134,7 +149,7 @@ const Sidebar = () => {
           "fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden transition-opacity duration-300",
           isMobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
-        onClick={() => setIsMobileOpen(false)}
+        onClick={closeMobile}
         aria-hidden="true"
       />
 

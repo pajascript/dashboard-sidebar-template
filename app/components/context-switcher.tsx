@@ -2,14 +2,14 @@
 
 import { Check, ChevronDown, HomeIcon, MapPinIcon, StoreIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useStoreSelector, stores, type Store, type Branch } from "@/lib/store";
+import { useStoreContext, stores, type Store, type Branch } from "@/lib/stores";
 
 const ContextSwitcher = () => {
-  // Zustand store - subscribe to specific slices for optimal re-renders
-  const selectedStore = useStoreSelector((state) => state.selectedStore);
-  const selectedBranch = useStoreSelector((state) => state.selectedBranch);
-  const switchStore = useStoreSelector((state) => state.switchStore);
-  const setSelectedBranch = useStoreSelector((state) => state.setSelectedBranch);
+  // Zustand - store/branch selection
+  const selectedStore = useStoreContext((state) => state.selectedStore);
+  const selectedBranch = useStoreContext((state) => state.selectedBranch);
+  const switchStore = useStoreContext((state) => state.switchStore);
+  const setSelectedBranch = useStoreContext((state) => state.setSelectedBranch);
 
   // Local UI state (dropdown open/close)
   const [isOpen, setIsOpen] = useState(false);

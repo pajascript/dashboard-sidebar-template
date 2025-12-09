@@ -4,11 +4,17 @@ import { sidebarLinks } from "@/constants";
 import { MenuIcon } from "lucide-react";
 import ContextSwitcher from "./context-switcher";
 import { usePathname } from "next/navigation";
-import { useSidebar } from "./sidebar-context";
+import { useStoreContext, useSidebarStore } from "@/lib/stores";
 
 const Header = () => {
   const pathname = usePathname();
-  const { toggleMobile } = useSidebar();
+  
+  // Zustand - mobile sidebar toggle
+  const toggleMobile = useSidebarStore((state) => state.toggleMobile);
+  
+  // Zustand - for displaying current context in mobile header
+  const selectedStore = useStoreContext((state) => state.selectedStore);
+  const selectedBranch = useStoreContext((state) => state.selectedBranch);
 
   const activePage =
     sidebarLinks.find((link) => {
@@ -35,7 +41,9 @@ const Header = () => {
           </button>
           <div>
             <h1 className="text-white text-xl font-bold">{activePage.title}</h1>
-            <p className="text-white/50 text-xs sm:hidden">Daily Dope Vicas</p> {/* selected store and branch */}
+            <p className="text-white/50 text-xs sm:hidden">
+              {selectedStore.label.split(" ")[0]} {selectedBranch.label}
+            </p>
           </div>
         </div>
         {/* Hide context switcher on mobile - it's in sidebar instead */}
