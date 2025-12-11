@@ -41,7 +41,7 @@ const Header = () => {
           </button>
           <div>
             <h1 className="text-white text-xl font-bold">{activePage.title}</h1>
-            <p className="text-white/50 text-xs sm:hidden">
+            <p className="text-white/50 text-xs md:hidden">
               {selectedStore.label.split(" ")[0]} {selectedBranch.label}
             </p>
           </div>
