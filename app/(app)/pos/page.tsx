@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Search, Minus, Plus, Trash2, Info, ArrowLeftRight, ShoppingCart, X } from "lucide-react";
 import { getProductsForBranch, getCategoriesForStore, LOW_STOCK_THRESHOLD, type Product } from "@/constants/pos-data";
-import { useStoreContext } from "@/lib/stores";
+import { useStoreContext, useTransactionsStore } from "@/lib/stores";
 import { cn } from "@/lib/utils";
 
 type CartItem = {
@@ -19,8 +19,14 @@ const POS = () => {
   const selectedStore = useStoreContext((state) => state.selectedStore);
   const selectedBranch = useStoreContext((state) => state.selectedBranch);
   
+  // Transactions store
+  const addTransaction = useTransactionsStore((state) => state.addTransaction);
+  
   // Mobile cart expansion state
   const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
+  
+  // Success message state
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // ====================================
   // DERIVED DATA - Based on Zustand state
@@ -112,6 +118,43 @@ const POS = () => {
 
   const removeFromCart = (productId: string) => {
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
+  };
+
+  const handleCheckout = async () => {
+    if (cart.length === 0) return;
+
+    try {
+      // Create transaction record
+      await addTransaction({
+        storeId: selectedStore.id,
+        storeName: selectedStore.label,
+        branchId: selectedBranch.id,
+        branchName: selectedBranch.label,
+        items: cart.map((item) => ({
+          productId: item.product.id,
+          productName: item.product.name,
+          quantity: item.quantity,
+          unitPrice: item.product.price,
+          lineTotal: item.product.price * item.quantity,
+        })),
+        subtotal,
+        discount,
+        total,
+      });
+
+      // Clear cart
+      setCart([]);
+      
+      // Close mobile cart if open
+      setIsMobileCartOpen(false);
+
+      // Show success message
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      alert("Failed to complete checkout. Please try again.");
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -285,6 +328,7 @@ const POS = () => {
 
           <button
             type="button"
+            onClick={handleCheckout}
             disabled={cart.length === 0}
             className="w-full rounded-xl bg-emerald-600 py-3.5 font-semibold text-white transition-colors hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -431,6 +475,7 @@ const POS = () => {
 
               <button
                 type="button"
+                onClick={handleCheckout}
                 disabled={cart.length === 0}
                 className="w-full rounded-xl bg-emerald-600 py-3.5 font-semibold text-white transition-colors hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -439,6 +484,16 @@ const POS = () => {
             </div>
           </div>
         </>
+      )}
+
+      {/* Success Toast */}
+      {showSuccessMessage && (
+        <div className="fixed top-6 right-6 z-100 animate-in fade-in slide-in-from-top-5 duration-300">
+          <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-6 py-4 shadow-2xl backdrop-blur-sm">
+            <p className="font-semibold text-emerald-400">✓ Transaction completed!</p>
+            <p className="text-sm text-emerald-300/80">Sale recorded successfully</p>
+          </div>
+        </div>
       )}
     </div>
   );

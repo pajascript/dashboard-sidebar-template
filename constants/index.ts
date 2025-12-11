@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Package, LayoutDashboard, Users, Settings, Receipt } from "lucide-react";
 
 export type SidebarLink = {
   title: string;
@@ -15,24 +15,29 @@ export const sidebarLinks: SidebarLink[] = [
     icon: ShoppingCart,
   },
   {
+    title: "Sales History",
+    route: "/sales-history",
+    icon: Receipt,
+  },
+  {
     title: "Inventory",
     route: "/inventory",
-    icon: ShoppingCart,
+    icon: Package,
   },
   {
     title: "Dashboard",
     route: "/dashboard",
-    icon: ShoppingCart,
+    icon: LayoutDashboard,
   },
   {
     title: "Employees",
     route: "/employees",
-    icon: ShoppingCart,
+    icon: Users,
   },
   {
     title: "Store Settings",
     route: "/settings",
-    icon: ShoppingCart,
+    icon: Settings,
   },
 ];
 
