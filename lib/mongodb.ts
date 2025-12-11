@@ -1,4 +1,4 @@
-import { MongoClient, Db } from "mongodb";
+import { MongoClient, Db, Document } from "mongodb";
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
@@ -51,7 +51,7 @@ export async function getDatabase(): Promise<Db> {
  * Get a specific collection
  * Usage: const transactions = await getCollection("transactions");
  */
-export async function getCollection<T = any>(collectionName: string) {
+export async function getCollection<T extends Document = Document>(collectionName: string) {
   const db = await getDatabase();
   return db.collection<T>(collectionName);
 }
